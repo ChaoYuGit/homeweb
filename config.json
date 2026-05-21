@@ -1,0 +1,9 @@
+{
+    "username": "cyu3",
+    "password": "supp0rt",
+    "port": 5000,
+    "host": "0.0.0.0",
+    "secret_key": "replace-with-a-random-secret-key",
+    "session_lifetime_hours": 24,
+    "file_root": "served_files"
+}

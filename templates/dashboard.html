@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Home Server{% endblock %}
+{% block content %}
+<h1>System Dashboard</h1>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h3>CPU</h3>
+        <div class="stat-value">{{ info.cpu_percent }}%</div>
+        <div class="stat-label">{{ info.cpu_count }} cores</div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ info.cpu_percent }}%"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Memory</h3>
+        <div class="stat-value">{{ info.memory_percent }}%</div>
+        <div class="stat-label">{{ (info.memory_used / 1073741824) | round(1) }} GB / {{ (info.memory_total / 1073741824) | round(1) }} GB</div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ info.memory_percent }}%"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Disk</h3>
+        <div class="stat-value">{{ info.disk_percent }}%</div>
+        <div class="stat-label">{{ (info.disk_used / 1073741824) | round(1) }} GB / {{ (info.disk_total / 1073741824) | round(1) }} GB</div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ info.disk_percent }}%"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Uptime</h3>
+        <div class="stat-value">{{ info.uptime_days }}d {{ info.uptime_hours }}h {{ info.uptime_minutes }}m</div>
+        <div class="stat-label">{{ info.hostname }}</div>
+    </div>
+</div>
+{% endblock %}
