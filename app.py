@@ -14,7 +14,7 @@ from flask import (
 from utils.auth import authenticate, create_user_session, load_config, login_required, logout_user
 from utils.db import init_db, get_notes, create_note, update_note, delete_note
 from utils.stock import get_stock_files
-from utils.system import get_system_info
+
 
 app = Flask(__name__)
 app.config.from_mapping(
@@ -58,7 +58,7 @@ def login():
         password = request.form["password"]
         if authenticate(username, password):
             create_user_session()
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("finreport"))
         flash("Invalid username or password", "error")
     return render_template("login.html")
 
@@ -67,16 +67,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-
-# ── Dashboard ──
-
-@app.route("/")
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    info = get_system_info()
-    return render_template("dashboard.html", info=info)
 
 
 # ── File Browser ──
@@ -158,20 +148,14 @@ def download_file(path):
     return send_from_directory(os.path.dirname(safe_path), os.path.basename(safe_path))
 
 
-# ── Stock Reports ──
+# ── Fin Reports ──
 
-@app.route("/stock")
+@app.route("/")
+@app.route("/finreport")
 @login_required
-def stock():
+def finreport():
     reports = get_stock_files()
-    return render_template("stock.html", reports=reports)
-
-
-@app.route("/daily")
-@login_required
-def daily():
-    reports = get_stock_files()
-    return render_template("daily.html", reports=reports)
+    return render_template("finreport.html", reports=reports)
 
 
 # ── Notes ──

@@ -9,15 +9,13 @@
 <body>
     <nav class="navbar">
         <div class="nav-brand">
-            <a href="{{ url_for('dashboard') }}">Home Server</a>
+            <a href="{{ url_for('finreport') }}">Home Server</a>
         </div>
         <input type="checkbox" id="nav-toggle" class="nav-toggle">
         <label for="nav-toggle" class="nav-toggle-label">&#9776;</label>
         <ul class="nav-links">
-            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
             <li><a href="{{ url_for('files') }}">Files</a></li>
-            <li><a href="{{ url_for('stock') }}">Stock</a></li>
-            <li><a href="{{ url_for('daily') }}">Daily</a></li>
+            <li><a href="{{ url_for('finreport') }}">FinReport</a></li>
             <li><a href="{{ url_for('notes') }}">Notes</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>

@@ -8,10 +8,21 @@ FILES = [
     ("Daily StockInFund", "03_Daily_StockInFund.txt"),
 ]
 
+LOG_FILES = [
+    ("Cron Weekday Log", "cron_weekday.log"),
+    ("Cron Friday Log", "cron_friday.log"),
+]
+
 
 def get_stock_files():
     reports = []
     for title, filename in FILES:
+        path = os.path.join(STOCK_DIR, filename)
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                content = f.read()
+            reports.append({"title": title, "filename": filename, "content": content})
+    for title, filename in LOG_FILES:
         path = os.path.join(STOCK_DIR, filename)
         if os.path.exists(path):
             with open(path, encoding="utf-8") as f:
