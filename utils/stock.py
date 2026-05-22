@@ -2,30 +2,36 @@ import os
 
 STOCK_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "database", "report")
 
-FILES = [
-    ("Daily Macro", "01_Daily_Macro.txt"),
-    ("Daily MyWatch", "02_Daily_MyWatch.txt"),
-    ("Daily StockInFund", "03_Daily_StockInFund.txt"),
+SECTIONS = [
+    ("sync",  "Sync Status",        "cron_daily.log"),
+    ("macro", "Macro Data",         "01_Daily_Macro.txt"),
+    ("mywatch", "MyWatch",          "02_Daily_MyWatch.txt"),
+    ("fund",  "StockInFund",        "03_Daily_StockInFund.txt"),
 ]
 
-LOG_FILES = [
-    ("Cron Weekday Log", "cron_weekday.log"),
-    ("Cron Friday Log", "cron_friday.log"),
-]
+
+def _read_file(filename):
+    path = os.path.join(STOCK_DIR, filename)
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            return f.read()
+    return None
 
 
 def get_stock_files():
     reports = []
-    for title, filename in FILES:
-        path = os.path.join(STOCK_DIR, filename)
-        if os.path.exists(path):
-            with open(path, encoding="utf-8") as f:
-                content = f.read()
-            reports.append({"title": title, "filename": filename, "content": content})
-    for title, filename in LOG_FILES:
-        path = os.path.join(STOCK_DIR, filename)
-        if os.path.exists(path):
-            with open(path, encoding="utf-8") as f:
-                content = f.read()
-            reports.append({"title": title, "filename": filename, "content": content})
+    for sid, title, filename in SECTIONS:
+        content = _read_file(filename)
+        if content is not None:
+            reports.append({"id": sid, "title": title, "filename": filename, "content": content})
     return reports
+
+
+def get_section(section_id):
+    for sid, title, filename in SECTIONS:
+        if sid == section_id:
+            content = _read_file(filename)
+            if content is not None:
+                return {"id": sid, "title": title, "filename": filename, "content": content}
+            return None
+    return None

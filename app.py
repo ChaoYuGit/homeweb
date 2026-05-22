@@ -13,7 +13,7 @@ from flask import (
 
 from utils.auth import authenticate, create_user_session, load_config, login_required, logout_user
 from utils.db import init_db, get_notes, create_note, update_note, delete_note
-from utils.stock import get_stock_files
+from utils.stock import get_section
 
 
 app = Flask(__name__)
@@ -154,8 +154,11 @@ def download_file(path):
 @app.route("/finreport")
 @login_required
 def finreport():
-    reports = get_stock_files()
-    return render_template("finreport.html", reports=reports)
+    section = request.args.get("section", "sync")
+    active_report = get_section(section)
+    if active_report is None:
+        active_report = {"id": "", "title": "No Data", "filename": "", "content": "No report data available."}
+    return render_template("finreport.html", report=active_report)
 
 
 # ── Notes ──

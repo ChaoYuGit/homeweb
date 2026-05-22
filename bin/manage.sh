@@ -6,6 +6,9 @@ REPORT_DIR="$SCRIPT_DIR/database/report"
 PID_FILE="$SCRIPT_DIR/.server.pid"
 CRON_TAG="# webserver-manage"
 
+# ── Deploy config (fill in your cloud host) ──
+CLOUD_HOST="cyu3@cloudhost"
+
 mkdir -p "$REPORT_DIR"
 
 usage() {
@@ -21,24 +24,26 @@ usage() {
     echo "  server:stop    Stop the web server"
     echo "  server:restart Restart the web server"
     echo "  server:status  Show web server status"
+    echo ""
+    echo "Deploy:"
+    echo "  deploy         Rsync project to cloud host (set CLOUD_HOST in script)"
 }
 
 cron_start() {
     TASK_WEEKDAY="/home/cyu3/projects/minifincode/run.sh"
     TASK_FRIDAY="/home/cyu3/projects/minifincode/run.sh weekly"
-    LOG_WEEKDAY="$REPORT_DIR/cron_weekday.log"
-    LOG_FRIDAY="$REPORT_DIR/cron_friday.log"
+    SYNC_CMD="rsync -azL --delete $REPORT_DIR/ $CLOUD_HOST:/home/cyu3/webserver/database/report/"
 
-    TASK_WEEKDAY_CRON="0 18 * * 1-4 $TASK_WEEKDAY >> $LOG_WEEKDAY 2>&1 $CRON_TAG"
-    TASK_FRIDAY_CRON="0 18 * * 5 $TASK_FRIDAY >> $LOG_FRIDAY 2>&1 $CRON_TAG"
+    TASK_WEEKDAY_CRON="0 18 * * 1-4 $TASK_WEEKDAY && $SYNC_CMD $CRON_TAG"
+    TASK_FRIDAY_CRON="0 18 * * 5 $TASK_FRIDAY && $SYNC_CMD $CRON_TAG"
 
-    (crontab -l 2>/dev/null | grep -v "$CRON_TAG"; echo "$TASK_WEEKDAY_CRON"; echo "$TASK_FRIDAY_CRON") | crontab -
+    (crontab -l 2>/dev/null | grep -v "$CRON_TAG" || true; echo "$TASK_WEEKDAY_CRON"; echo "$TASK_FRIDAY_CRON") | crontab -
 
-    echo "Cron jobs created (Mon-Thu 6pm, Fri 6pm weekly). Logs go to $REPORT_DIR"
+    echo "Cron jobs created (Mon-Thu 6pm, Fri 6pm weekly). Logs handled by run.sh"
 }
 
 cron_stop() {
-    crontab -l 2>/dev/null | grep -v "$CRON_TAG" | crontab -
+    crontab -l 2>/dev/null | grep -v "$CRON_TAG" | crontab - 2>/dev/null || true
     echo "Cron jobs removed."
 }
 
@@ -100,6 +105,22 @@ server_status() {
     fi
 }
 
+deploy() {
+    if [ -z "$CLOUD_HOST" ]; then
+        echo "Error: CLOUD_HOST is not set. Edit bin/manage.sh to set it."
+        exit 1
+    fi
+    TARGET="/home/cyu3/webserver"
+    echo "Deploying $SCRIPT_DIR to $CLOUD_HOST:$TARGET ..."
+    rsync -avzL --delete \
+        --exclude='__pycache__/' \
+        --exclude='.server.pid' \
+        --exclude='venv/' \
+        --exclude='.git/' \
+        "$SCRIPT_DIR/" "$CLOUD_HOST:$TARGET/"
+    echo "Deploy complete."
+}
+
 case "${1:-help}" in
     cron:start)   cron_start ;;
     cron:stop)    cron_stop ;;
@@ -108,6 +129,7 @@ case "${1:-help}" in
     server:stop)   server_stop ;;
     server:restart) server_restart ;;
     server:status)  server_status ;;
+    deploy)        deploy ;;
     help|--help|-h) usage ;;
     *) echo "Unknown command: $1"; usage; exit 1 ;;
 esac

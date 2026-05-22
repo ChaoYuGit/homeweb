@@ -349,7 +349,46 @@ a:hover { color: var(--primary-hover); }
 }
 .modal-close:hover { color: var(--text); }
 
-/* Responsive for mobile */
+/* Dropdown */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    min-width: 160px;
+    padding: 0.25rem 0;
+    z-index: 200;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.dropdown-content li {
+    list-style: none;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+.dropdown-content a:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
 @media (max-width: 768px) {
     .nav-toggle-label { display: block; }
 
@@ -365,6 +404,19 @@ a:hover { color: var(--primary-hover); }
     }
 
     .nav-toggle:checked ~ .nav-links { display: flex; }
+
+    .dropdown {
+        position: static;
+    }
+
+    .dropdown-content {
+        position: static;
+        border: none;
+        box-shadow: none;
+        padding-left: 1rem;
+        display: block;
+        background: transparent;
+    }
 
     .file-row {
         grid-template-columns: 1fr 80px;
