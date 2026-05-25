@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}ETF - FinReport{% endblock %}
+{% block content %}
+<h1>ETF观察</h1>
+<div style="margin: 1rem 0;">
+    <a href="{{ url_for('download_report', filename='04_Weekly_ETF.xlsx') }}" class="btn btn-primary">Download 04_Weekly_ETF.xlsx</a>
+    {% if tables.date %}<span style="margin-left: 1.5rem; font-size: 0.9rem; color: #aaa;">数据日期: {{ tables.date }}</span>{% endif %}
+</div>
+
+<h2>涨跌幅 (1d - 7d)</h2>
+<table class="etf-table sortable" data-sort-col="3">
+    <thead>
+        <tr>
+            <th>基金代码</th>
+            <th>基金名称</th>
+            {% for h in tables.table1_headers %}
+            <th{% if loop.first %} class="sort-desc"{% endif %}>{{ h }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in tables.table1 %}
+        <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.name }}</td>
+            {% for i in range(1, 8) %}
+            <td><span class="pct">{{ row['c' ~ i] }}</span><br><span class="dollar">{{ row['d' ~ i] }}</span></td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>区间涨跌 (交易日, 含今年)</h2>
+<table class="etf-table sortable" data-sort-col="3">
+    <thead>
+        <tr>
+            <th>基金代码</th>
+            <th>基金名称</th>
+            {% for h in tables.table2_headers %}
+            <th{% if loop.first %} class="sort-desc"{% endif %}>{{ h }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in tables.table2 %}
+        <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.name }}</td>
+            {% for i in range(1, 10) %}
+            <td><span class="pct">{{ row['c' ~ i] }}</span><br><span class="dollar">{{ row['d' ~ i] }}</span></td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>月涨跌</h2>
+<table class="etf-table sortable" data-sort-col="3">
+    <thead>
+        <tr>
+            <th>基金代码</th>
+            <th>基金名称</th>
+            {% for h in tables.table3_headers %}
+            <th{% if loop.first %} class="sort-desc"{% endif %}>{{ h }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in tables.table3 %}
+        <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.name }}</td>
+            {% for i in range(1, 13) %}
+            <td><span class="pct">{{ row['c' ~ i] }}</span><br><span class="dollar">{{ row['d' ~ i] }}</span></td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>季涨跌</h2>
+<table class="etf-table sortable" data-sort-col="3">
+    <thead>
+        <tr>
+            <th>基金代码</th>
+            <th>基金名称</th>
+            {% for h in tables.table4_headers %}
+            <th{% if loop.first %} class="sort-desc"{% endif %}>{{ h }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in tables.table4 %}
+        <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.name }}</td>
+            {% for i in range(1, 9) %}
+            <td>{{ row['c' ~ i] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+document.querySelectorAll('.sortable').forEach(function(table) {
+    var defaultCol = parseInt(table.getAttribute('data-sort-col')) || 3;
+    var tbody = table.querySelector('tbody');
+    var headers = table.querySelectorAll('th');
+
+    function sortTable(colIdx, descending) {
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort(function(a, b) {
+            var va = a.children[colIdx].textContent.trim();
+            var vb = b.children[colIdx].textContent.trim();
+            var na = parseFloat(va);
+            var nb = parseFloat(vb);
+            if (!isNaN(na) && !isNaN(nb)) {
+                return descending ? nb - na : na - nb;
+            }
+            return descending ? vb.localeCompare(va) : va.localeCompare(vb);
+        });
+        rows.forEach(function(r) { tbody.appendChild(r); });
+        headers.forEach(function(h) { h.classList.remove('sort-asc', 'sort-desc'); });
+        if (colIdx >= 0) {
+            headers[colIdx].classList.add(descending ? 'sort-desc' : 'sort-asc');
+        }
+    }
+
+    headers.forEach(function(th, idx) {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', function() {
+            var isDesc = !th.classList.contains('sort-desc');
+            sortTable(idx, isDesc);
+        });
+    });
+
+    if (defaultCol < headers.length) {
+        sortTable(defaultCol, true);
+    }
+});
+</script>
+{% endblock %}

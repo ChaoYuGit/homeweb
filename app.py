@@ -13,7 +13,7 @@ from flask import (
 
 from utils.auth import authenticate, create_user_session, load_config, login_required, logout_user
 from utils.db import init_db, get_notes, create_note, update_note, delete_note
-from utils.stock import get_section
+from utils.stock import get_etf_data, get_fund_weekly_data, get_section
 
 
 app = Flask(__name__)
@@ -155,10 +155,33 @@ def download_file(path):
 @login_required
 def finreport():
     section = request.args.get("section", "sync")
+    if section == "etf":
+        data = get_etf_data()
+        if data is None:
+            flash("ETF data not available", "error")
+            return redirect(url_for("finreport"))
+        return render_template("etf.html", tables=data)
+    if section == "fund_weekly":
+        data = get_fund_weekly_data()
+        if data is None:
+            flash("Fund weekly data not available", "error")
+            return redirect(url_for("finreport"))
+        return render_template("fund_weekly.html", data=data)
     active_report = get_section(section)
     if active_report is None:
         active_report = {"id": "", "title": "No Data", "filename": "", "content": "No report data available."}
     return render_template("finreport.html", report=active_report)
+
+
+@app.route("/finreport/download/<path:filename>")
+@login_required
+def download_report(filename):
+    report_dir = os.path.join(os.path.dirname(__file__), "database", "report")
+    safe_path = os.path.realpath(os.path.join(report_dir, filename))
+    if not safe_path.startswith(os.path.realpath(report_dir)) or not os.path.isfile(safe_path):
+        flash("Access denied", "error")
+        return redirect(url_for("finreport"))
+    return send_from_directory(os.path.dirname(safe_path), os.path.basename(safe_path))
 
 
 # ── Notes ──

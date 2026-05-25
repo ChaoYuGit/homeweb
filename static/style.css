@@ -389,6 +389,68 @@ a:hover { color: var(--primary-hover); }
     display: block;
 }
 
+/* ETF Tables */
+.etf-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0 1.5rem;
+    font-size: 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+.etf-table thead {
+    background: var(--bg);
+}
+.etf-table th {
+    padding: 0.5rem 0.6rem;
+    text-align: right;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    user-select: none;
+}
+.etf-table th:first-child,
+.etf-table td:first-child {
+    text-align: left;
+}
+.etf-table th:nth-child(2),
+.etf-table td:nth-child(2) {
+    text-align: left;
+}
+.etf-table td {
+    padding: 0.4rem 0.6rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    line-height: 1.4;
+}
+.etf-table td .pct {
+    font-size: 0.95rem;
+}
+.etf-table td .dollar {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.etf-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+.etf-table th.sort-desc::after {
+    content: " ▼";
+    font-size: 0.7rem;
+}
+.etf-table th.sort-asc::after {
+    content: " ▲";
+    font-size: 0.7rem;
+}
+.etf-table th small {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
 @media (max-width: 768px) {
     .nav-toggle-label { display: block; }
 
